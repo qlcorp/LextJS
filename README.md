@@ -1,0 +1,4 @@
+LextJS
+======
+
+Laravel ExtJS Bundle
