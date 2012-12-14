@@ -1,0 +1,7 @@
+CREATE TABLE `movies` (
+`id` BIGINT AUTO_INCREMENT, 
+`title` VARCHAR(255), 
+`year` INTEGER(4), 
+PRIMARY KEY(id) )
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = INNODB;
+
