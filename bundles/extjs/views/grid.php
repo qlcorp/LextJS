@@ -1,28 +1,17 @@
 <script>
 Ext.require(['Ext.data.*', 'Ext.grid.*']);
 
-Ext.define('Movies', {
-    extend: 'Ext.data.Model',
-    fields: [{
-        name: 'title',
-        type: 'string'
-    }, 
-    {
-        name: 'year',
-        type: 'int'
-    }
-    ]
-});
+<?php echo File::get( path('public') . 'js/EXTmodels/'.$model .'.js' ); //including Ext model ?>
 
 Ext.onReady(function(){
 
     var store = Ext.create('Ext.data.Store', {
         autoLoad: true,
         autoSync: true,
-        model: 'Movies',
+        model: '<?php echo $model ?>',                                       
         proxy: {
             type: 'rest',
-            url: 'movies',
+            url: '<?php echo Str::lower($model) ?>',              
             reader: {
                 type: 'json',
                 root: 'data'
@@ -41,28 +30,27 @@ Ext.onReady(function(){
         width: 400,
         height: 300,
         frame: true,
-        title: 'Movies list from DB',
+        title: 'List of <?php echo $model?>',
         store: store,
         iconCls: 'icon-user',
         columns: [
+            <?php  
+            $columns = Cache::get('ext'.$model );
+            foreach ($columns as $column)
             {
-                header: 'Title',
-                dataIndex: 'title',
-                editor: {
+              if ($column->field == 'id') continue;
+             echo " { header: '".$column->field . '\',';
+             echo " dataIndex: '".$column->field . '\',';
+             echo "editor: {
                     xtype: 'textfield',
                     allowBlank: true
                 },
                 flex: 1
-            },
-            {
-                header: 'Year',
-                dataIndex: 'year',
-                editor: {
-                    xtype: 'numberfield',
-                    allowBlank: true
-                },
-                flex: 1
-            } ],
+            },";
+            }
+            
+            ?>
+            ],
         dockedItems: [{
             xtype: 'toolbar',
             items: [{
@@ -70,19 +58,19 @@ Ext.onReady(function(){
                 iconCls: 'icon-add',
                 handler: function(){
                     rowEditing.cancelEdit();
-                    var newRecord = new Movies()
+                    var newRecord = new <?php echo $model.'()' ?> 
 
                     store.insert(0, newRecord);
                     rowEditing.startEdit(0, 0);
 
                     var sm = grid.getSelectionModel();
 
-                    grid.on('edit', function() {
-                        var record = sm.getSelection()[0]
-                        //store.sync();
-                        store.remove(record);
-                        store.load();
-                    });
+//                    grid.on('edit', function() {
+//                        var record = sm.getSelection()[0]
+//                        //store.sync();
+//                        store.remove(record);
+//                        store.load();
+//                    });
 
 
 
