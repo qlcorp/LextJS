@@ -1,2 +1,0 @@
-<?php
-lext::form('Users');

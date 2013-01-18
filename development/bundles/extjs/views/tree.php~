@@ -1,0 +1,107 @@
+<script>    
+Ext.onReady(function() {
+var store = Ext.create('Ext.data.TreeStore', {
+    fields: ['text'],
+        proxy: {
+            type: 'rest',
+            url: 'nodes',              
+            reader: {
+                type: 'json',
+                root: 'data'
+            },
+            writer: {
+                type: 'json'
+            }
+        },
+        autosync: true,
+        root: {
+            text: 'Ext JS',
+            id: 0,
+            expanded: false
+        }
+    });
+
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing');
+
+var tree = Ext.create('Ext.tree.Panel', {
+    renderTo: Ext.getBody(),
+    selType: 'rowmodel',
+        plugins: [
+        Ext.create('Ext.grid.plugin.RowEditing', {
+            clicksToEdit: 2
+        })],
+ //   selType: 'cellmodel',
+  //  plugins: [
+   //     Ext.create('Ext.grid.plugin.CellEditing', {
+     //       clicksToEdit: 2
+      //  })
+    ],
+    title: '<?php echo $model ?> Tree',
+    width: 250,
+    height: 300,
+    store: store,
+    
+    viewConfig: {
+        listeners: { 
+                beforedrop: function( node, data, overModel, dropPosition,dropHandler, eOpts ) {
+                    var array = new Array();
+                    for (var i=0;i<data.records.length;i++)
+                        { 
+                            array.push (data.records[i].data.id);
+                        }
+                    Ext.Ajax.request({
+                        url: 'save',   
+                        jsonData: { to: overModel.data.id, action: dropPosition, ids: array  } 
+});
+                }  
+              },
+            plugins: {
+                ptype: 'treeviewdragdrop'            
+            }
+        },
+        
+        dockedItems: [{
+            xtype: 'toolbar',
+            items: [{
+                text: 'Add leaf',
+                iconCls: 'icon-add',
+                handler: function(){
+            var record = tree.getSelectionModel().getSelection()[0];
+            record.appendChild({
+                id: 'c4',
+                text: 'new leaf',
+                leaf: true
+            });
+
+            store.sync();
+            }
+            
+            }, '-', {
+                text: 'Add node',
+                handler: function(){
+                    var record = tree.getSelectionModel().getSelection()[0];
+                record.appendChild({
+                id: 'c4',
+                text: 'new node',
+                leaf: false
+                    });
+                }
+            }, '-' ,
+            {
+                text: 'Delete',
+                iconCls: 'icon-delete',
+                handler: function(){
+                    var record = tree.getSelectionModel().getSelection()[0];
+                    record.remove();
+                    store.sync();
+                }
+            }
+            ] //end of items
+        }]
+        
+        
+        
+});
+
+});
+</script>
